@@ -1,0 +1,158 @@
+<html>
+<head>
+<link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.css') }}" media="screen" title="no title">
+<link rel="stylesheet" href="{{ url_for('static', filename='my_css.css') }}" media="screen" title="no title">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.7.2/dist/Chart.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/javascript.util/0.12.12/javascript.util.min.js"></script>
+<script src="{{url_for('static', filename='jquery.js')}}"></script>
+
+<script>
+        var server_url = 'http://52.90.88.55:8081/';
+        var forecast_endpoint = server_url + 'forecast/'
+    
+        var horizontalBarChartData = {
+            labels: [],
+            datasets: []
+        };
+    
+        var forecastButtonClickHandler = function(e){
+            console.log('forecastButtonClickHandler called')
+            $('#structure-data-table').empty();
+        
+            var input_ = $('#input_date').val();
+    
+            var date = input_.split('-');
+            date = String(date[0])+String(date[1])+String(date[2]);
+            // console.log(date)
+            
+            $.ajax({
+                type:'GET',
+                url: forecast_endpoint + date,
+                success: function(result) {
+                    displayData(JSON.parse(result))
+                }     
+            });
+        }
+    
+        var displayData = function(data) {
+            displayTable(data)
+            displayChart(data)
+        }
+    
+        var displayTable = function(data) {
+            var tableRows = []
+            for(var i = 0; i < 5; i++) {
+                var obj = data[i];
+                tableRows.push("<tr><td>" + obj.DATE + "</td>");
+                tableRows.push("<td>" + obj.TMAX + "</td>");
+                tableRows.push("<td>" + obj.TMIN + "</td></tr>"); 
+            }
+    
+            $('#structure-data-table').show();        
+            $('#structure-data-table').append(tableRows.join(""));
+            $('#structure-header-table').show();
+        }
+    
+        var displayChart = function(data){
+            var tmax = [];
+            var tmin =[];
+            var dates = [];
+    
+            for(var i = 0; i < data.length; i++) {
+                var obj = data[i];
+                dates.push(obj.DATE);
+                tmax.push(obj.TMAX);
+                tmin.push(obj.TMIN);
+            }
+    
+            console.log(data);
+            console.log(dates)
+            console.log(tmax)
+    
+            window.weather_report.data.labels = [ 
+                dates[0],
+                dates[1],
+                dates[2],
+                dates[3],
+                dates[4]
+            ]
+    
+            window.weather_report.data.datasets = [
+                {
+                    label: 'TMAX',
+                    backgroundColor: ["#669911","#669911","#669911","#669911","#669911"],
+                    // backgroundColor: color(window.chartColors.red).alpha(0.5).rgbString(),
+                    // borderColor: window.chartColors.red,
+                    borderWidth: 1,
+                    data: tmax
+                }, {
+                    label: 'TMIN',
+                    backgroundColor: ["#66A2EB", "#66A2EB", "#66A2EB", "#66A2EB", "#66A2EB"],
+                    // borderColor: window.chartColors,
+                    data: tmin
+                }
+            ]
+    
+            window.weather_report.update()
+             
+        }
+    
+        $(document).ready(function() {
+            var MeSeContext = document.getElementById("ChartjsCanvas").getContext("2d");
+            window.weather_report = new Chart(MeSeContext, {
+                type: 'horizontalBar',
+                data: horizontalBarChartData,
+                options: {
+                        scales: {
+                        xAxes: [{
+                            ticks: {
+                                min: 20
+                            }
+                        }],
+                        yAxes: [{
+                            stacked: false
+                        }]
+                    },
+                        // Elements options apply to all of the options unless overridden in a dataset
+                        // In this case, we are setting the border of each horizontal bar to be 2px wide
+                        elements: {
+                            rectangle: {
+                                borderWidth: 2,
+                            }
+                        },
+                        responsive: true,
+                        legend: {
+                            position: 'right',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Weather'
+                        }
+                    }
+            }); 
+            $('#data-forecast-button').click('click', forecastButtonClickHandler);
+        });
+        
+    </script>
+</head>
+<body>
+<br>
+<input type="date" id="input_date" name="input_date" value="input_date">
+<button id="data-forecast-button">Data Forecast</button>
+<br>
+<br>
+<table id="structure-header-table" border=1 align="center" style="display:none">
+<th>DATE</th>
+<th>TMAX</th>
+<th>TMIN</th>
+<div id="container" style="width: 75%;">
+    <canvas id="ChartjsCanvas"></canvas>
+</div>
+
+</table>
+<table id="structure-data-table" border=1 align="center" style="display:none">
+</table>
+<br>
+<br> 
+</body>
+</html>

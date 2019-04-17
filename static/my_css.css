@@ -1,0 +1,45 @@
+h1{
+	width:50%;
+	background-color:black;
+	color:white;
+	text-align:center;
+	display:inline-block;
+	border-radius:10px;
+	font-family: "Times New Roman", Times, serif, cursive;
+	
+}
+#buttons{
+	border-radius:10px;
+	width:50%;
+	background-color: rgb(31, 212, 14);
+	text-align:center;
+	display:inline-block;
+}
+#result{
+	border-radius:10px;
+	width:50%;
+	background-color: rgb(99, 189, 201);
+	text-align:center;
+	display:inline-block;
+	
+}
+th{
+	border: 1px solid;
+	padding: 8px;
+	width: 150px;
+}
+
+td{
+	border: 1px solid;
+	padding: 8px;
+	width: 150px;
+}
+#chartContainer{
+	width:50%;
+	height:250px;
+	display:inline-block;
+	}
+
+body{
+text-align:center;
+}
